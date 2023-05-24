@@ -85,6 +85,20 @@ impl Session {
         }
     }
 
+    ///
+    pub async fn continuation(&mut self, msg: actix_http::ws::Item) -> Result<(), Closed>
+    {
+        self.pre_check();
+        if let Some(inner) = self.inner.as_mut() {
+            inner
+                .send(Message::Continuation(msg))
+                .await
+                .map_err(|_| Closed)
+        } else {
+            Err(Closed)
+        }
+    }
+
     /// Ping the client
     ///
     /// For many applications, it will be important to send regular pings to keep track of if the
